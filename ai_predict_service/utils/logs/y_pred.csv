@@ -1,0 +1,5 @@
+filename,predicted_class
+1.wav,burr
+2.wav,burr
+3.wav,healthy
+4.wav,burr

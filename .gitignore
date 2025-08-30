@@ -1,0 +1,38 @@
+# Виртуальные окружения
+venv/
+.venv/
+env/
+.env/
+ENV/
+.ENV/
+.venv37
+venv37
+# Кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Логи
+*.log
+
+# Настройки IDE
+.vscode/
+.idea/
+
+# Артефакты сборки
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Тестовые отчёты
+.coverage
+htmlcov/
+.tox/
+pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Секреты (на всякий случай)
+*.env
