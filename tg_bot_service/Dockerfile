@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN cat requirements.txt && echo "Installing requirements..." && pip install --no-cache-dir -r requirements.txt
 
 # Копирование исходного кода
-COPY src/ ./src/
+COPY app/ ./src/
 
 # Создание директории для записей
 RUN mkdir -p /app/records

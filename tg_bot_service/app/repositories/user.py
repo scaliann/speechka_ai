@@ -1,0 +1,24 @@
+from sqlalchemy import Result, select
+from app.models.user import User
+from app.base_repository import BaseRepository
+
+
+class UserRepository(BaseRepository):
+    async def get_or_create(  # ToDo Разделить функцию на две - get и create и вынести бизнес логику в слой сервисов
+        self,
+        tg_id: int,
+    ) -> User:
+        """Получить или создать пользователя"""
+        query = select(
+            User,
+        ).where(
+            User.tg_id == tg_id,
+        )
+        result: Result = await self.session.execute(query)
+        user = result.scalar()
+        if user is None:
+            user = User(tg_id=tg_id)
+            self.session.add(user)
+            await self.session.commit()
+            await self.session.refresh(user)
+        return user
