@@ -1,11 +1,11 @@
 from sqlalchemy import select, Result
 
-from app.base_repository import BaseRepository
+from app.repositories.base import BaseRepository
 from app.models.words import Word
 
 
 class WordRepository(BaseRepository):
-    async def list_words(
+    async def get_list_words(
         self,
     ) -> list[Word]:
         query = select(

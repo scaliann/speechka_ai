@@ -1,6 +1,6 @@
 from sqlalchemy import Result, select
 from app.models.user import User
-from app.base_repository import BaseRepository
+from app.repositories.base import BaseRepository
 
 
 class UserRepository(BaseRepository):
@@ -21,4 +21,28 @@ class UserRepository(BaseRepository):
             self.session.add(user)
             await self.session.commit()
             await self.session.refresh(user)
+        return user
+
+    async def get_user(
+        self,
+        tg_id: int,
+    ) -> User:
+        """Получить или создать пользователя"""
+        query = select(
+            User,
+        ).where(
+            User.tg_id == tg_id,
+        )
+        result: Result = await self.session.execute(query)
+        user = result.scalar()
+        return user
+
+    async def create_user(
+        self,
+        tg_id: int,
+    ) -> User:
+        user = User(tg_id=tg_id)
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
         return user

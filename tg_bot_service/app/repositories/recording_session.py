@@ -1,5 +1,5 @@
-from sqlalchemy import Result, func, select
-from app.base_repository import BaseRepository
+from sqlalchemy import Result, func, select, update
+from app.repositories.base import BaseRepository
 from app.common.enums import SessionStatus
 from app.models.recording_session import RecordingSession
 
@@ -17,8 +17,8 @@ class SessionRepository(BaseRepository):
             RecordingSession.status == SessionStatus.active,
         )
         result: Result = await self.session.execute(query)
-        active_session: RecordingSession = result.scalar()
-        return active_session
+        active_recording_session: RecordingSession = result.scalar()
+        return active_recording_session
 
     async def create(
         self,
@@ -39,11 +39,18 @@ class SessionRepository(BaseRepository):
         await self.session.refresh(session_obj)
         return session_obj
 
-    async def complete(
+    async def update_status(
         self,
-        session: RecordingSession,
+        recording_session_id: int,
+        status: SessionStatus,
     ) -> None:
-        """Поменять статус сессии на завершенный."""
-        session.status = SessionStatus.completed
-        session.finished_at = func.now()
+        """Обновить статус сессии."""
+        query = update(RecordingSession).values(
+            status=status,
+        )
+        session.status = status
+        if status == SessionStatus.completed:
+            query = update(RecordingSession).values(
+                finished_at=func.now(),
+            )
         await self.session.commit()

@@ -1,24 +1,8 @@
-from typing import TYPE_CHECKING
-
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.db.db_helper import get_async_session
-
-from app.word.models import Word
-
-WORDS = [
-    "Рыжий рыцарь рубит рыбу",
-    "Зоркий радар заметил ракету",
-    "Карл крал кораллы у Клары",
-    "Роза выросла на заре у ручья",
-    "Зебра смело ступила за забор",
-    "Быстрый барс проскочил через ограду",
-    "Рыжий кот мурлычет на солнечной крыше",
-    "Зоркая сова сторожит сказочный лес ночью",
-    "Бодрый бобр строит плотину из ровных брёвен",
-    "Смелый спасатель спас сверчка из лужи",
-]
+from app.models.words import Word
+from app.content.words import WORDS
 
 
 async def seed_basic_words() -> None:

@@ -1,10 +1,7 @@
-import datetime
-
 from sqlalchemy import String
 
-from app.base import Base
+from app.models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.common.utils import utc_plus_3
 
 
 class Word(Base):

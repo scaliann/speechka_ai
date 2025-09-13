@@ -1,13 +1,6 @@
-from pathlib import Path
-from aiogram import Bot
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.diagnostic.repositories import DiagnosisRepository
-from app.user.repositories import UserRepository
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.word.repositories import WordRepository
-from app.recording.repositories import RecordingRepository, SessionRepository
-from aiogram.types import Voice
-from app.recording.file_utils import save_voice
 
 
 class DiagnosisService:

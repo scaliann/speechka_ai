@@ -6,8 +6,7 @@ from app.db.db_helper import get_async_session
 from app.diagnostic.repositories import DiagnosisRepository
 from app.keyboards.sessions import get_session_kbs
 from app.diagnostic.utils import get_user_id_by_tg_id
-from app.recording.repositories import RecordingRepository
-from app.user.handlers import check_user_agreement, show_terms_agreement
+from app.repositories.recording import RecordingRepository
 import httpx
 
 router = Router()
@@ -37,18 +36,6 @@ async def send_for_diag(paths: list[str]):
 
 @router.message(F.text == "Диагностика")
 async def show_main_menu(message: Message):
-    # Проверяем согласие пользователя
-    agreed = await check_user_agreement(message.from_user.id)
-
-    if not agreed:
-        await show_terms_agreement(
-            message,
-            message.bot.fsm.get_context(
-                bot=message.bot, user_id=message.from_user.id, chat_id=message.chat.id
-            ),
-        )
-        return
-
     user_tg_id: int = message.from_user.id
     user_id: int = await get_user_id_by_tg_id(user_tg_id)
     session_kbs = await get_session_kbs(user_id)
@@ -61,17 +48,6 @@ async def show_main_menu(message: Message):
 @router.message(F.text.regexp(r"^Сессия\s+\d+$"))
 async def handle_session_result(msg: Message):
     """Пользователь нажал кнопку «Сессия N»."""
-    # Проверяем согласие пользователя
-    agreed = await check_user_agreement(msg.from_user.id)
-
-    if not agreed:
-        await show_terms_agreement(
-            msg,
-            msg.bot.fsm.get_context(
-                bot=msg.bot, user_id=msg.from_user.id, chat_id=msg.chat.id
-            ),
-        )
-        return
 
     try:
         session_number = int(msg.text.split()[-1])

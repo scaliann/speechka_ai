@@ -1,11 +1,10 @@
-import datetime as dt
+from sqlalchemy import Result, select
 
-from sqlalchemy import Result, func, select, result_tuple
-from app.recording.models import Recording, RecordingSession, SessionStatus
-from app.repositories import BaseRepo
+from app.repositories.base import BaseRepository
+from app.models.recording_session import RecordingSession
 
 
-class DiagnosisRepository(BaseRepo):
+class DiagnosisRepository(BaseRepository):
 
     async def get_last_five_users_sessions(
         self, user_id: int
@@ -27,13 +26,10 @@ class DiagnosisRepository(BaseRepo):
         return user_sessions
 
     async def get_by_number(
-            self, user_id: int, session_number: int
+        self, user_id: int, session_number: int
     ) -> RecordingSession | None:
-        stmt = (
-            select(RecordingSession)
-            .where(
-                RecordingSession.user_id == 1,
-                RecordingSession.session_number == session_number,
-            )
+        stmt = select(RecordingSession).where(
+            RecordingSession.user_id == 1,
+            RecordingSession.session_number == session_number,
         )
         return await self.session.scalar(stmt)

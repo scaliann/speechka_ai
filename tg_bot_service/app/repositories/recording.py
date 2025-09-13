@@ -1,8 +1,5 @@
-import datetime as dt
-
-from sqlalchemy import Result, func, select, result_tuple
-from app.base_repository import BaseRepository
-from app.common.enums import SessionStatus
+from sqlalchemy import Result, func, select
+from app.repositories.base import BaseRepository
 from app.models.recording import Recording
 from app.models.recording_session import RecordingSession
 
@@ -31,14 +28,14 @@ class RecordingRepository(BaseRepository):
 
     async def create(
         self,
-        session_id: int,
+        recording_session_id: int,
         user_id: int,
         word_id: int,
         file_path: str = "",
     ) -> Recording:
         """Создать объект Recording"""
         recording = Recording(
-            session_id=session_id,
+            recording_session_id=recording_session_id,
             user_id=user_id,
             word_id=word_id,
             file_path=str(file_path),
@@ -50,7 +47,7 @@ class RecordingRepository(BaseRepository):
 
     async def count_in_session(
         self,
-        session_id: int,
+        recording_session_id: int,
     ) -> int:
         """Получить количество записей в сессии по session_id"""
         query = (
@@ -61,7 +58,7 @@ class RecordingRepository(BaseRepository):
                 Recording,
             )
             .where(
-                Recording.session_id == session_id,
+                Recording.recording_session_id == recording_session_id,
             )
         )
         return await self.session.scalar(query)
@@ -88,7 +85,7 @@ class RecordingRepository(BaseRepository):
 
     async def get_paths_by_session(
         self,
-        session_id: int,
+        recording_session_id: int,
     ) -> list[str]:
         """Получить список путей файлов записи по id сессии"""
         query = (
@@ -96,7 +93,7 @@ class RecordingRepository(BaseRepository):
                 Recording.file_path,
             )
             .where(
-                Recording.session_id == session_id,
+                Recording.recording_session_id == recording_session_id,
             )
             .order_by(
                 Recording.word_id,

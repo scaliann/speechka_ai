@@ -1,5 +1,5 @@
 from app.db.db_helper import get_async_session
-from app.user.repositories import UserRepository
+from app.repositories.user import UserRepository
 
 
 async def get_user_id_by_tg_id(

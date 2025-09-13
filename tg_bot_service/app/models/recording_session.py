@@ -1,16 +1,16 @@
 import datetime as dt
-from sqlalchemy import DateTime, String, BigInteger, ForeignKey, UniqueConstraint, Enum
+from sqlalchemy import DateTime, ForeignKey, UniqueConstraint, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import TYPE_CHECKING
-from app.base import Base
+from app.models.base import Base
 
 from app.common.enums import SessionStatus
 from app.common.utils import utc_plus_3
 
 if TYPE_CHECKING:
-    from app.user.models import User
-    from app.word.models import Word
+    from app.models.user import User
+    from app.models.words import Word
 
 
 class RecordingSession(Base):
@@ -31,9 +31,9 @@ class RecordingSession(Base):
     finished_at: Mapped[dt.datetime | None]
 
     user: Mapped["User"] = relationship(
-        back_populates="sessions",
+        back_populates="recording_sessions",
     )
     recordings: Mapped[list["Recording"]] = relationship(
-        back_populates="session",
+        back_populates="recording_sessions",
         cascade="all, delete-orphan",
     )
