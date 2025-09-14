@@ -1,4 +1,4 @@
-from app.db.db_helper import get_async_session
+from app.db.database import get_async_session
 from app.repositories.user import UserRepository
 
 

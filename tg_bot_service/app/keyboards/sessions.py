@@ -1,6 +1,6 @@
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
 
-from app.db.db_helper import get_async_session
+from app.db.database import get_async_session
 from app.diagnostic.services import DiagnosisService
 
 
@@ -17,7 +17,7 @@ async def get_session_kbs(user_id):
     kb = ReplyKeyboardMarkup(
         keyboard=rows,
         resize_keyboard=True,
-        one_time_keyboard=True,  # кнопки уберутся после нажатия
+        one_time_keyboard=True,
     )
 
     return kb

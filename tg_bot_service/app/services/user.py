@@ -1,5 +1,5 @@
 from app.content.terms_command_text import terms_command_text
-from app.db.db_helper import get_async_session
+from app.db.database import get_async_session
 from app.fms.terms_agreement_state import TermsAgreement
 from app.keyboards.menu import kb_terms
 from app.repositories.user import UserRepository

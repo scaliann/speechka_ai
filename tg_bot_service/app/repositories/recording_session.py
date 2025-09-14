@@ -45,12 +45,27 @@ class SessionRepository(BaseRepository):
         status: SessionStatus,
     ) -> None:
         """Обновить статус сессии."""
-        query = update(RecordingSession).values(
-            status=status,
-        )
-        session.status = status
-        if status == SessionStatus.completed:
-            query = update(RecordingSession).values(
-                finished_at=func.now(),
+        query = (
+            update(
+                RecordingSession,
             )
-        await self.session.commit()
+            .values(
+                status=status,
+            )
+            .where(
+                RecordingSession.id == recording_session_id,
+            )
+        )
+
+        if status == SessionStatus.completed:
+            query = (
+                update(RecordingSession)
+                .values(
+                    finished_at=func.now(),
+                    status=status,
+                )
+                .where(
+                    RecordingSession.id == recording_session_id,
+                )
+            )
+        await self.session.execute(query)

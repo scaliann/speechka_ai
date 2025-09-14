@@ -1,4 +1,4 @@
-from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 
 kb_menu = ReplyKeyboardMarkup(

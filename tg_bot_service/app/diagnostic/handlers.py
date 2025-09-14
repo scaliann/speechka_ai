@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message
 from pathlib import Path
 
-from app.db.db_helper import get_async_session
+from app.db.database import get_async_session
 from app.diagnostic.repositories import DiagnosisRepository
 from app.keyboards.sessions import get_session_kbs
 from app.diagnostic.utils import get_user_id_by_tg_id

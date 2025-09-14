@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.types import Voice
 
 from app.common.enums import SessionStatus
-from app.common.utils import save_voice
+from app.common.utils import save_voice_to_mongo
 from app.fms.recording_state import Recording
 from app.keyboards.menu import kb_menu
 from app.models.recording_session import RecordingSession
@@ -13,6 +13,8 @@ from app.models.user import User
 from app.models.words import Word
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+
+from app.repositories.mongo import MongoRecordingsRepository
 from app.repositories.recording import RecordingRepository
 from app.repositories.recording_session import SessionRepository
 from app.repositories.user import UserRepository
@@ -85,13 +87,14 @@ class RecordingService:
         total_words: int,
     ) -> bool:
         """Функция отвечает за сохранение голосового"""
-        file_path = await save_voice(
+        file_path = await save_voice_to_mongo(
             bot=bot,
             voice=voice,
             tg_id=tg_id,
             recording_session_id=recording_session_id,
             word_id=word_id,
         )
+
         await self.recording_repository.create(
             recording_session_id=recording_session_id,
             user_id=user_id,
@@ -113,3 +116,13 @@ class RecordingService:
                 )
                 return True
         return False
+
+    async def update_status(
+        self,
+        recording_session_id: int,
+        status: SessionStatus,
+    ) -> None:
+        await self.recording_session_repository.update_status(
+            recording_session_id=recording_session_id,
+            status=status,
+        )

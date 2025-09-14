@@ -4,16 +4,18 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
+from app.common.enums import SessionStatus
 from app.content.finished_answer_text import finished_answer_text
 from app.content.next_word_recording_answer_text import (
     get_next_word_recording_answer_text,
 )
 from app.content.recording_session_aborted_text import recording_session_aborted_text
 from app.content.start_recording_answer_text import get_recording_answer_text
-from app.db.db_helper import get_async_session
+from app.db.database import get_async_session
 from app.fms.recording_state import Recording
 from app.keyboards.menu import kbs_menu, kb_menu
 from app.services.recording import RecordingService
+from app.services.recording_session import RecordingSessionService
 from app.services.user import UserService
 
 router = Router()
@@ -26,17 +28,18 @@ async def start_recording(
     state: FSMContext,
 ) -> None:
     user_service = UserService()
-    async with get_async_session() as session:
-        recording_service = RecordingService(session)
 
     agreed = await user_service.check_user_agreement(tg_id=msg.from_user.id)
     if not agreed:
         await user_service.show_terms_agreement(msg, state)
         return
 
-    user, recording_session, words = await recording_service.start_session(
-        msg.from_user.id
-    )
+    async with get_async_session() as session:
+        recording_service = RecordingService(session)
+        user, recording_session, words = await recording_service.start_session(
+            msg.from_user.id
+        )
+
     await state.update_data(
         session_id=recording_session.id,
         word_ids=[w.id for w in words],
@@ -62,8 +65,17 @@ async def return_to_menu(
     msg: Message,
     state: FSMContext,
 ) -> None:
-    await state.clear()  # ToDo Вот тут вот нужно делать так, чтобы сессия браковалась. Добавить флаг в бд "aborted". Выводить только завершенные сесии + предупржедать, что сессия не записалась.
+    data = await state.get_data()
+    recording_session_id: int | None = data.get("session_id")
 
+    async with get_async_session() as session:
+        recording_session_service = RecordingSessionService(session)
+        await recording_session_service.update_status(
+            recording_session_id=recording_session_id,
+            status=SessionStatus.aborted,
+        )
+
+    await state.clear()
     await msg.answer(
         text=recording_session_aborted_text,
         reply_markup=kbs_menu,
@@ -81,16 +93,16 @@ async def handle_voice(msg: Message, state: FSMContext):
 
     async with get_async_session() as session:
         service = RecordingService(session)
+        finished = await service.save_recording(
+            bot=msg.bot,
+            voice=msg.voice,
+            recording_session_id=recording_session_id,
+            user_id=user_id,
+            word_id=word_ids[idx],
+            tg_id=msg.from_user.id,
+            total_words=len(word_ids),
+        )
 
-    finished = await service.save_recording(
-        bot=msg.bot,
-        voice=msg.voice,
-        recording_session_id=recording_session_id,
-        user_id=user_id,
-        word_id=word_ids[idx],
-        tg_id=msg.from_user.id,
-        total_words=len(word_ids),
-    )
     logger.info("saved rec — session=%s word=%s", recording_session_id, word_ids[idx])
 
     if finished:

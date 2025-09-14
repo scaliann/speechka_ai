@@ -5,8 +5,10 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
+
+from app.db.mongo_db import setup_mongodb
 from config import settings
-from db.db_helper import init_db
+from db.database import init_db
 from handlers import (
     start_router,
     recording_router,
@@ -34,6 +36,8 @@ dp.include_router(user_router)
 async def on_startup():
     await init_db()
     logging.info("Database initialized")
+    await setup_mongodb()
+    logging.info("Mongo initialized")
 
 
 def main():
