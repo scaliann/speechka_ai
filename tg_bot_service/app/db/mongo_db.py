@@ -17,7 +17,6 @@ ctx = _AppContext()
 
 
 async def setup_mongodb() -> None:
-    """Инициализация Mongo как у вас: ctx + settings."""
     if not settings.MONGO_URI:
         return
     ctx.mongo_client = motor_asyncio.AsyncIOMotorClient(settings.MONGO_URI)

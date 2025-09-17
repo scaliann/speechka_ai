@@ -5,6 +5,7 @@ from app.keyboards.menu import kb_terms
 from app.repositories.user import UserRepository
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram import types
 
 
 class UserService:
@@ -21,11 +22,11 @@ class UserService:
 
     async def show_terms_agreement(
         self,
-        message: Message,
+        cq: types.CallbackQuery,
         state: FSMContext,
     ) -> None:
         """Показывает пользовательское соглашение"""
-        await message.answer(
+        await cq.message.answer(
             terms_command_text, reply_markup=kb_terms, parse_mode="Markdown"
         )
         await state.set_state(TermsAgreement.waiting_for_agreement)

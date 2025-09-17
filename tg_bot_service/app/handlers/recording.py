@@ -1,6 +1,6 @@
 from __future__ import annotations
 import logging
-from aiogram import Router, F
+from aiogram import Router, F, types
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
@@ -13,7 +13,11 @@ from app.content.recording_session_aborted_text import recording_session_aborted
 from app.content.start_recording_answer_text import get_recording_answer_text
 from app.db.database import get_async_session
 from app.fms.recording_state import Recording
-from app.keyboards.menu import kbs_menu, kb_menu
+from app.keyboards.menu import (
+    build_ikb_open_menu,
+    build_ikb_training_actions,
+    build_ikb_abort_session,
+)
 from app.services.recording import RecordingService
 from app.services.recording_session import RecordingSessionService
 from app.services.user import UserService
@@ -22,22 +26,22 @@ router = Router()
 logger = logging.getLogger(__name__)
 
 
-@router.message(F.text == "Начать запись")
+@router.callback_query(F.data == "rec:start")
 async def start_recording(
-    msg: Message,
+    cq: types.CallbackQuery,
     state: FSMContext,
 ) -> None:
     user_service = UserService()
 
-    agreed = await user_service.check_user_agreement(tg_id=msg.from_user.id)
+    agreed = await user_service.check_user_agreement(tg_id=cq.from_user.id)
     if not agreed:
-        await user_service.show_terms_agreement(msg, state)
+        await user_service.show_terms_agreement(cq, state)
         return
 
     async with get_async_session() as session:
         recording_service = RecordingService(session)
         user, recording_session, words = await recording_service.start_session(
-            msg.from_user.id
+            cq.from_user.id
         )
 
     await state.update_data(
@@ -52,17 +56,17 @@ async def start_recording(
         words=words,
         word=words[0].text,
     )
-    await msg.answer(
+    await cq.message.answer(
         text=answer_text,
-        reply_markup=kb_menu,
+        reply_markup=build_ikb_abort_session(),
         parse_mode="HTML",
     )
     await state.set_state(Recording.waiting_voice)
 
 
-@router.message(Recording.waiting_voice, F.text == "Меню")
+@router.callback_query(Recording.waiting_voice, F.data == "session:abort")
 async def return_to_menu(
-    msg: Message,
+    cq: types.CallbackQuery,
     state: FSMContext,
 ) -> None:
     data = await state.get_data()
@@ -76,9 +80,9 @@ async def return_to_menu(
         )
 
     await state.clear()
-    await msg.answer(
+    await cq.message.answer(
         text=recording_session_aborted_text,
-        reply_markup=kbs_menu,
+        reply_markup=build_ikb_training_actions(),
     )
 
 
@@ -108,7 +112,7 @@ async def handle_voice(msg: Message, state: FSMContext):
     if finished:
         await msg.answer(
             text=finished_answer_text,
-            reply_markup=kbs_menu,
+            reply_markup=build_ikb_open_menu(),
         )
         await state.clear()
         return
@@ -125,7 +129,7 @@ async def handle_voice(msg: Message, state: FSMContext):
     await msg.answer(
         text=answer_text,
         parse_mode="HTML",
-        reply_markup=kb_menu,
+        reply_markup=build_ikb_abort_session(),
     )
 
 

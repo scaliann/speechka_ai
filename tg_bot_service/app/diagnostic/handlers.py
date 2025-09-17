@@ -12,7 +12,9 @@ import httpx
 router = Router()
 
 
-async def send_for_diag(paths: list[str]):
+async def send_for_diag(
+    paths: list[str],
+):
     # Transform relative paths to absolute paths for the AI services
     # The AI services expects paths relative to /app/records
     transformed_paths = []

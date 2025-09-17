@@ -2,7 +2,6 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from app.db.database import get_async_session
-from app.keyboards.menu import kbs_menu
 from app.repositories.user import UserRepository
 
 router = Router()

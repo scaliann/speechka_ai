@@ -1,16 +1,15 @@
-from aiogram import Router, F
-from aiogram.types import Message
+from aiogram import Router, F, types
 from app.content.menu_command_text import menu_command_text
-from app.keyboards.menu import kbs_menu
+from app.keyboards.menu import build_ikb_training_actions
 
 router = Router()
 
 
-@router.message(F.text == "Меню")
+@router.callback_query(F.data == "menu:open")
 async def show_main_menu(
-    message: Message,
+    cq: types.CallbackQuery,
 ) -> None:
-    await message.answer(
+    await cq.message.answer(
         menu_command_text,
-        reply_markup=kbs_menu,
+        reply_markup=build_ikb_training_actions(),
     )

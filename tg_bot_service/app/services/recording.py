@@ -7,7 +7,6 @@ from aiogram.types import Voice
 from app.common.enums import SessionStatus
 from app.common.utils import save_voice_to_mongo
 from app.fms.recording_state import Recording
-from app.keyboards.menu import kb_menu
 from app.models.recording_session import RecordingSession
 from app.models.user import User
 from app.models.words import Word
@@ -33,29 +32,6 @@ class RecordingService:
         self.word_repository = WordRepository(session)
         self.recording_repository = RecordingRepository(session)
         self.recording_session_repository = SessionRepository(session)
-
-    async def start_recording(
-        self,
-        msg: Message,
-        state: FSMContext,
-    ) -> None:
-        """Начало записи. Обновляем stage"""
-
-        user, recording_session, words = await self.start_session(msg.from_user.id)
-        await state.update_data(
-            session_id=recording_session.id,
-            word_ids=[w.id for w in words],
-            words=[w.text for w in words],
-            idx=0,
-            user_id=user.id,
-        )
-
-        await msg.answer(
-            f"🗝️ Сессия №{recording_session.session_number} открыта!\n\n🎯 Квест-предложение 1 из {len(words)}: <b>«{words[0].text}»</b>.\nНажми запись и произнеси его громко-смело, чтобы зарядить свой магический кристалл голоса! 🎙️",
-            reply_markup=kb_menu,
-            parse_mode="HTML",
-        )
-        await state.set_state(Recording.waiting_voice)
 
     async def start_session(
         self,
