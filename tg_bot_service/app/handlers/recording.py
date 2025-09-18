@@ -1,14 +1,16 @@
 from __future__ import annotations
 import logging
-from aiogram import Router, F, types
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
+from pydantic import with_config
 
 from app.common.enums import SessionStatus
 from app.content.finished_answer_text import finished_answer_text
 from app.content.next_word_recording_answer_text import (
     get_next_word_recording_answer_text,
 )
+from app.content.non_voice_answer_text import non_voice_answer_text
 from app.content.recording_session_aborted_text import recording_session_aborted_text
 from app.content.start_recording_answer_text import get_recording_answer_text
 from app.db.database import get_async_session
@@ -28,15 +30,15 @@ logger = logging.getLogger(__name__)
 
 @router.callback_query(F.data == "rec:start")
 async def start_recording(
-    cq: types.CallbackQuery,
+    cq: CallbackQuery,
     state: FSMContext,
 ) -> None:
-    user_service = UserService()
-
-    agreed = await user_service.check_user_agreement(tg_id=cq.from_user.id)
-    if not agreed:
-        await user_service.show_terms_agreement(cq, state)
-        return
+    async with get_async_session() as session:
+        user_service = UserService(session)
+        agreed = await user_service.check_user_agreement(tg_id=cq.from_user.id)
+        if not agreed:
+            await user_service.show_user_agreement(cq, state)
+            return
 
     async with get_async_session() as session:
         recording_service = RecordingService(session)
@@ -65,8 +67,8 @@ async def start_recording(
 
 
 @router.callback_query(Recording.waiting_voice, F.data == "session:abort")
-async def return_to_menu(
-    cq: types.CallbackQuery,
+async def abort_session(
+    cq: CallbackQuery,
     state: FSMContext,
 ) -> None:
     data = await state.get_data()
@@ -87,7 +89,10 @@ async def return_to_menu(
 
 
 @router.message(Recording.waiting_voice, F.voice)
-async def handle_voice(msg: Message, state: FSMContext):
+async def handle_voice(
+    msg: Message,
+    state: FSMContext,
+) -> None:
     data = await state.get_data()
     idx = data["idx"]
     word_ids = data["word_ids"]
@@ -133,8 +138,13 @@ async def handle_voice(msg: Message, state: FSMContext):
     )
 
 
-@router.message(Recording.waiting_voice)
-async def handle_not_voice(msg: Message):
+@router.message(
+    Recording.waiting_voice,
+)
+async def handle_not_voice(
+    msg: Message,
+) -> None:
     await msg.answer(
-        "Пожалуйста, пришли именно *голосовое сообщение*.", reply_markup=kb_menu
+        text=non_voice_answer_text,
+        reply_markup=build_ikb_abort_session(),
     )

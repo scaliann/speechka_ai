@@ -1,13 +1,11 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-kb_terms = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Согласен с пользовательским соглашением")],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
+
+def build_ikb_access_user_agreement() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    kb.button(text="Принимаю", callback_data="agreement:access")
+    return kb.as_markup()
 
 
 def build_ikb_training_actions() -> InlineKeyboardMarkup:
@@ -17,6 +15,7 @@ def build_ikb_training_actions() -> InlineKeyboardMarkup:
     kb.button(text="🎯 Тренировочные задания", callback_data="test:test")
     kb.button(text="🌀 Скороговорки", callback_data="test:test")
     kb.button(text="💰 Оплата", callback_data="diag:run")
+    kb.button(text="📖 Подробнее", callback_data="details:open")
     kb.adjust(1)
     return kb.as_markup()
 

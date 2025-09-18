@@ -1,4 +1,4 @@
-from sqlalchemy import Result, select
+from sqlalchemy import Result, select, update
 from app.models.user import User
 from app.repositories.base import BaseRepository
 
@@ -46,3 +46,16 @@ class UserRepository(BaseRepository):
         await self.session.commit()
         await self.session.refresh(user)
         return user
+
+    async def set_agreed(
+        self,
+        tg_id: int,
+    ) -> None:
+        query = (
+            update(User)
+            .values(agreed_to_terms=True)
+            .where(
+                User.tg_id == tg_id,
+            )
+        )
+        await self.session.execute(query)

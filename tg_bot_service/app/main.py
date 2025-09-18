@@ -4,10 +4,10 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats, MenuButtonDefault
 from dotenv import load_dotenv
 
 from app.db.mongo_db import setup_mongodb
+from app.keyboards.left_bar_menu import setup_menu
 from config import settings
 from db.database import init_db
 from handlers import (
@@ -15,6 +15,9 @@ from handlers import (
     recording_router,
     menu_router,
     user_router,
+    details_router,
+    user_agreement_router,
+    diagnosis_router,
 )
 
 load_dotenv()
@@ -31,19 +34,9 @@ dp.include_router(start_router)
 dp.include_router(recording_router)
 dp.include_router(menu_router)
 dp.include_router(user_router)
-# dp.include_router(diagnostic_router)
-
-
-async def setup_menu(bot: Bot):
-    await bot.set_my_commands(
-        commands=[
-            BotCommand(command="start", description="🏠 Главное меню"),
-            BotCommand(command="help", description="❓ Помощь 📖"),
-            BotCommand(command="privacy", description="🏛️ Конфиденциальность"),
-        ],
-        scope=BotCommandScopeAllPrivateChats(),
-    )
-    await bot.set_chat_menu_button(menu_button=MenuButtonDefault())
+dp.include_router(details_router)
+dp.include_router(user_agreement_router)
+dp.include_router(diagnosis_router)
 
 
 async def on_startup():

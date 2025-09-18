@@ -1,23 +1,25 @@
-from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import (
+    Message,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.db.database import get_async_session
-from app.diagnostic.services import DiagnosisService
+
+CB_MENU_OPEN = "menu:open"
+CB_DIAG_SESSION_PREFIX = "diag:session:"
 
 
-async def get_session_kbs(user_id):
-    async with get_async_session() as session:
-        service = DiagnosisService(session)
-
-    user_sessions = await service.get_last_five_users_sessions(user_id)
-
-    rows = [[KeyboardButton(text="Меню")]] + [
-        [KeyboardButton(text=f"Сессия {s.session_number}")] for s in user_sessions
-    ]
-
-    kb = ReplyKeyboardMarkup(
-        keyboard=rows,
-        resize_keyboard=True,
-        one_time_keyboard=True,
-    )
-
-    return kb
+def build_ikb_user_sessions(sessions) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    for s in sessions:
+        kb.button(
+            text=f"Сессия {s.session_number}",
+            callback_data=f"{CB_DIAG_SESSION_PREFIX}{s.id}",
+        )
+    kb.adjust(2)  # по 2 в ряд (хочешь — поставь 1)
+    kb.row(InlineKeyboardButton(text="⬅️ Меню", callback_data=CB_MENU_OPEN))
+    return kb.as_markup()
