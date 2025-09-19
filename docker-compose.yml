@@ -1,49 +1,13 @@
-version: '3.8'
+version: '3.1'
 
 services:
-  # AI Predict Service
-  ai_predict_service:
-    build:
-      context: ./ai_predict_service
-      dockerfile: Dockerfile
-      no_cache: true
-    container_name: ai_predict_service
+  mongo:
+    image: mongo
     ports:
-      - "8000:8000"
+      - "27017:27017"
     volumes:
-      - ./records:/app/records
-    environment:
-      - PYTHONPATH=/app
-    networks:
-      - speechka_network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # Telegram Bot Service
-  tg_bot_service:
-    build:
-      context: ./tg_bot_service
-      dockerfile: Dockerfile
-    container_name: tg_bot_service
-    volumes:
-      - ./records:/app/records
-      - ./tg_bot_service/.env:/app/.env:ro
-    environment:
-      - PYTHONPATH=/app
-    depends_on:
-      - ai_predict_service
-    networks:
-      - speechka_network
-    restart: unless-stopped
+      - mongo-data:/data/db
 
 volumes:
-  records_data:
-
-networks:
-  speechka_network:
-    driver: bridge
+  mongo-data:
+  postgres-data:
