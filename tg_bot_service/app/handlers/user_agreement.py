@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from app.content.user_agreement_command_text import user_agreement_command_text
-from app.db.database import get_async_session
+from app.database.database import get_async_session
 from app.keyboards.menu import build_ikb_training_actions, build_ikb_open_menu
 from app.services.user import UserService
 

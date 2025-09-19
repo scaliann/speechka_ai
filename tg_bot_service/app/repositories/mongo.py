@@ -4,7 +4,7 @@ from typing import Optional
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
-from app.db.mongo_db import ctx, settings
+from app.database.mongo_db import ctx, settings
 
 
 class MongoRecordingsRepository:

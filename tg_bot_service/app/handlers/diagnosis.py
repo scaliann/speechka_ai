@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
-from app.db.database import get_async_session
+from app.database.database import get_async_session
 from app.keyboards.sessions import build_ikb_user_sessions
 import httpx
 
@@ -72,9 +72,9 @@ async def show_diagnosis(
 #
 #     user_tg_id = msg.from_user.id
 #
-#     async with get_async_session() as db:
-#         diag_repo = DiagnosisRepository(db)
-#         rec_repo = RecordingRepository(db)
+#     async with get_async_session() as database:
+#         diag_repo = DiagnosisRepository(database)
+#         rec_repo = RecordingRepository(database)
 #
 #         session_obj = await diag_repo.get_by_number(
 #             user_id=user_tg_id,

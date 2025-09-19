@@ -6,10 +6,10 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 
-from app.db.mongo_db import setup_mongodb
+from app.database.mongo_db import setup_mongodb
 from app.keyboards.left_bar_menu import setup_menu
 from config import settings
-from db.database import init_db
+from database.database import init_db
 from handlers import (
     start_router,
     recording_router,
