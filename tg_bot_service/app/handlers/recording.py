@@ -13,7 +13,7 @@ from app.content.next_word_recording_answer_text import (
 from app.content.non_voice_answer_text import non_voice_answer_text
 from app.content.recording_session_aborted_text import recording_session_aborted_text
 from app.content.start_recording_answer_text import get_recording_answer_text
-from app.db.database import get_async_session
+from app.database.database import get_async_session
 from app.fms.recording_state import Recording
 from app.keyboards.menu import (
     build_ikb_open_menu,

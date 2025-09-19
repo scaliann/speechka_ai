@@ -27,6 +27,6 @@ async def init_db() -> None:
         # Create all tables in the database
         await conn.run_sync(Base.metadata.create_all)
 
-    from app.db.seed_words import seed_basic_words
+    from app.database.seed_words import seed_basic_words
 
     await seed_basic_words()

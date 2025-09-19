@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from app.db.database import get_async_session
+from app.database.database import get_async_session
 from app.models.words import Word
 from app.content.words import WORDS
 

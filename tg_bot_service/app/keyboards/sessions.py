@@ -7,7 +7,7 @@ from aiogram.types import (
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.db.database import get_async_session
+from app.database.database import get_async_session
 
 CB_MENU_OPEN = "menu:open"
 CB_DIAG_SESSION_PREFIX = "diag:session:"
