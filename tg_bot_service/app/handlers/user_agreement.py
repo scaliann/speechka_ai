@@ -1,6 +1,8 @@
+from pathlib import Path
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from app.content.user_agreement_command_text import user_agreement_command_text
 from app.database.database import get_async_session
@@ -8,6 +10,9 @@ from app.keyboards.menu import build_ikb_training_actions, build_ikb_open_menu
 from app.services.user import UserService
 
 router = Router()
+
+BASE_DIR = Path(__file__).parent.parent
+USER_AGREEMENT_PDF_PATH = BASE_DIR / "media/files/user_agreement.pdf"
 
 
 @router.callback_query(F.data == "agreement:access")
@@ -32,7 +37,12 @@ async def agree_to_terms(
 async def show_agreement(
     message: Message,
 ) -> None:
-    await message.answer(
-        text=user_agreement_command_text,
+    doc = FSInputFile(
+        USER_AGREEMENT_PDF_PATH,
+        filename="Пользовательское соглашение.pdf",
+    )
+    await message.answer_document(
+        document=doc,
+        caption=f"Пользовательское соглашение",
         reply_markup=build_ikb_open_menu(),
     )

@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 from app.models.base import Base
 
 from app.models.tongue_twister import TongueTwister
+from app.models.training import Training
 
 DATABASE_URL = settings.database_url
 
@@ -30,6 +31,8 @@ async def init_db() -> None:
 
     from app.database.seed_values.seed_words import seed_basic_words
     from app.database.seed_values.seed_tongue_twisters import seed_tongue_twisters
+    from app.database.seed_values.seed_training import seed_training
 
     await seed_basic_words()
     await seed_tongue_twisters()
+    await seed_training()

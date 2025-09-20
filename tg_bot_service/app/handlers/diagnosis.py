@@ -20,7 +20,7 @@ from app.services.user import UserService
 router = Router()
 
 BASE_DIR = Path(__file__).parent.parent
-PDF_PATH = BASE_DIR / "templates/pdf.pdf"
+PDF_PATH = BASE_DIR / "templates/burr_recommendation.pdf"
 
 
 @router.callback_query(F.data == "diagnosis:show")
@@ -54,7 +54,7 @@ async def handle_session_result_cq(cq: CallbackQuery):
 
     try:
         m = re.match(r"^diagnosis:session:(\d+)$", cq.data or "")
-        session_number = int(m.group(1))
+        recording_session_id = int(m.group(1))
     except ValueError:
         await cq.message.answer("Номер сессии не распознан.")
         return
@@ -65,9 +65,8 @@ async def handle_session_result_cq(cq: CallbackQuery):
         user_service = UserService(session)
 
         user = await user_service.get_or_create(cq.from_user.id)
-        recording_session = await recording_session_service.get_by_number(
-            user_id=user.id,
-            session_number=session_number,
+        recording_session = await recording_session_service.get_by_id(
+            recording_session_id=recording_session_id,
         )
         if not recording_session:
             await cq.message.answer("Такой сессии не найдено.")

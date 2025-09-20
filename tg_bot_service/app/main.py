@@ -17,6 +17,7 @@ from handlers import (
     user_agreement_router,
     diagnosis_router,
     tongue_twister_router,
+    training_router,
 )
 
 load_dotenv()
@@ -37,6 +38,7 @@ dp.include_router(details_router)
 dp.include_router(user_agreement_router)
 dp.include_router(diagnosis_router)
 dp.include_router(tongue_twister_router)
+dp.include_router(training_router)
 
 
 async def on_startup():

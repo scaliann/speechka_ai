@@ -45,24 +45,43 @@ async def start_recording(
         user, recording_session, words = await recording_service.start_session(
             cq.from_user.id
         )
-
+        count_in_session = (
+            await recording_service.recording_repository.count_in_session(
+                recording_session_id=recording_session.id
+            )
+        )
     await state.update_data(
         session_id=recording_session.id,
         word_ids=[w.id for w in words],
         words=[w.text for w in words],
-        idx=0,
+        idx=count_in_session,
         user_id=user.id,
     )
-    answer_text = get_recording_answer_text(
-        recording_session_number=recording_session.session_number,
-        words=words,
-        word=words[0].text,
-    )
-    await cq.message.answer(
-        text=answer_text,
-        reply_markup=build_ikb_abort_session(),
-        parse_mode="HTML",
-    )
+
+    if count_in_session == 0:
+        answer_text = get_recording_answer_text(
+            recording_session_number=recording_session.session_number,
+            words=words,
+            word=words[0].text,
+        )
+        await cq.message.answer(
+            text=answer_text,
+            reply_markup=build_ikb_abort_session(),
+            parse_mode="HTML",
+        )
+    else:
+        answer_text = get_next_word_recording_answer_text(
+            previous_word=str(words[count_in_session - 1].text),
+            next_word=str(words[count_in_session].text),
+            current_word_number=count_in_session + 1,
+            total_words_length=len(words),
+        )
+        await cq.message.answer(
+            text=answer_text,
+            parse_mode="HTML",
+            reply_markup=build_ikb_abort_session(),
+        )
+
     await state.set_state(Recording.waiting_voice)
 
 

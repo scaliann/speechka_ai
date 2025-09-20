@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.content.user_agreement_command_text import user_agreement_command_text
@@ -6,7 +8,10 @@ from app.keyboards.menu import build_ikb_access_user_agreement
 from app.models.user import User
 from app.repositories.user import UserRepository
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
+
+BASE_DIR = Path(__file__).parent.parent
+USER_AGREEMENT_PDF_PATH = BASE_DIR / "media/files/user_agreement.pdf"
 
 
 class UserService:
@@ -31,8 +36,14 @@ class UserService:
         state: FSMContext,
     ) -> None:
         """Показывает пользовательское соглашение"""
-        await cq.message.answer(
-            user_agreement_command_text,
+        doc = FSInputFile(
+            USER_AGREEMENT_PDF_PATH,
+            filename="Пользовательское соглашение.pdf",
+        )
+
+        await cq.message.answer_document(
+            document=doc,
+            caption="Пожалуйста, ознакомьтесь с пользовательским соглашением",
             reply_markup=build_ikb_access_user_agreement(),
             parse_mode="Markdown",
         )

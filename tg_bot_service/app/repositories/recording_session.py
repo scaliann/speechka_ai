@@ -107,3 +107,14 @@ class SessionRepository(BaseRepository):
             RecordingSession.session_number == session_number,
         )
         return await self.session.scalar(query)
+
+    async def get_by_id(
+        self,
+        recording_session_id: int,
+    ) -> RecordingSession | None:
+        query = select(
+            RecordingSession,
+        ).where(
+            RecordingSession.id == recording_session_id,
+        )
+        return await self.session.scalar(query)

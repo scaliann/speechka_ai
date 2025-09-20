@@ -43,3 +43,11 @@ class RecordingSessionService:
             user_id=user_id,
             session_number=session_number,
         )
+
+    async def get_by_id(
+        self,
+        recording_session_id: int,
+    ) -> RecordingSession:
+        return await self.recording_session_repository.get_by_id(
+            recording_session_id=recording_session_id,
+        )
