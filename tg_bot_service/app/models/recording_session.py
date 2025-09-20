@@ -2,15 +2,10 @@ import datetime as dt
 from sqlalchemy import DateTime, ForeignKey, UniqueConstraint, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
-from typing import TYPE_CHECKING
 from app.models.base import Base
 
 from app.common.enums import SessionStatus
 from app.common.utils import utc_plus_3
-
-if TYPE_CHECKING:
-    from app.models.user import User
-    from app.models.words import Word
 
 
 class RecordingSession(Base):
@@ -20,7 +15,7 @@ class RecordingSession(Base):
     )
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    session_number: Mapped[int]
+    session_number: Mapped[int] = mapped_column(ForeignKey("recording_session.id"))
     status: Mapped[SessionStatus] = mapped_column(
         Enum(SessionStatus),
         default=SessionStatus.active,

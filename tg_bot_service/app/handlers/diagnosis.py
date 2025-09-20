@@ -3,12 +3,14 @@ from aiogram.types import CallbackQuery, BufferedInputFile, FSInputFile
 
 from app.clients.diagnosis import DiagnosisClient
 from app.clients.requests.diagnosis import DiagnosisRequest
+from app.common.enums import DiagnosisResult
 
 from app.database.database import get_async_session
 from app.keyboards.sessions import build_ikb_user_sessions
 from pathlib import Path
 
 from app.repositories.user import UserRepository
+from app.services.diagnosis import DiagnosisService
 from app.services.recording import RecordingService
 from app.services.recording_session import RecordingSessionService
 import re
@@ -21,7 +23,7 @@ BASE_DIR = Path(__file__).parent.parent
 PDF_PATH = BASE_DIR / "templates/pdf.pdf"
 
 
-@router.callback_query(F.data == "diag:show")
+@router.callback_query(F.data == "diagnosis:show")
 async def show_diagnosis(
     cq: CallbackQuery,
 ):
@@ -46,12 +48,12 @@ async def show_diagnosis(
     await cq.answer()
 
 
-@router.callback_query(F.data.regexp(r"^diag:session:(\d+)$"))
+@router.callback_query(F.data.regexp(r"^diagnosis:session:(\d+)$"))
 async def handle_session_result_cq(cq: CallbackQuery):
     """Пользователь нажал кнопку «Сессия N»."""
 
     try:
-        m = re.match(r"^diag:session:(\d+)$", cq.data or "")
+        m = re.match(r"^diagnosis:session:(\d+)$", cq.data or "")
         session_number = int(m.group(1))
     except ValueError:
         await cq.message.answer("Номер сессии не распознан.")
@@ -79,14 +81,23 @@ async def handle_session_result_cq(cq: CallbackQuery):
         await cq.message.answer("У этой сессии нет записей.")
         return
     data = DiagnosisRequest(mongo_ids=mongo_object_ids)
-    results = await DiagnosisClient().get_diagnosis(data=data)
+    diagnosis_response = await DiagnosisClient().get_diagnosis(data=data)
+
+    async with get_async_session() as session:
+        diagnosis_service = DiagnosisService(session)
+
+        await diagnosis_service.save_diagnosis(
+            diagnosis=diagnosis_response.diagnosis,
+            results=str(diagnosis_response.results),
+            user_id=user.id,
+            recording_session_id=recording_session.id,
+        )
 
     doc = FSInputFile(
         PDF_PATH,
         filename="report.pdf",
     )
-
     await cq.message.answer_document(
         document=doc,
-        caption=f"Ваш PDF 📄. Результат: {results}",
+        caption=f"Ваш PDF 📄. Результат: {diagnosis_response}",
     )

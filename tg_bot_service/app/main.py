@@ -1,7 +1,5 @@
 import asyncio
 import logging
-
-
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
@@ -18,6 +16,7 @@ from handlers import (
     details_router,
     user_agreement_router,
     diagnosis_router,
+    tongue_twister_router,
 )
 
 load_dotenv()
@@ -37,6 +36,7 @@ dp.include_router(user_router)
 dp.include_router(details_router)
 dp.include_router(user_agreement_router)
 dp.include_router(diagnosis_router)
+dp.include_router(tongue_twister_router)
 
 
 async def on_startup():

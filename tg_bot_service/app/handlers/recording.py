@@ -28,7 +28,7 @@ router = Router()
 logger = logging.getLogger(__name__)
 
 
-@router.callback_query(F.data == "rec:start")
+@router.callback_query(F.data == "recording:start")
 async def start_recording(
     cq: CallbackQuery,
     state: FSMContext,

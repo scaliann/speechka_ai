@@ -5,3 +5,4 @@ from .user import router as user_router
 from .details import router as details_router
 from .user_agreement import router as user_agreement_router
 from .diagnosis import router as diagnosis_router
+from .tongue_twister import router as tongue_twister_router
