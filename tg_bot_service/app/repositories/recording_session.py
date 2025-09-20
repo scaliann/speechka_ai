@@ -100,10 +100,10 @@ class SessionRepository(BaseRepository):
         user_id: int,
         session_number: int,
     ) -> RecordingSession | None:
-        stmt = select(
+        query = select(
             RecordingSession,
         ).where(
             RecordingSession.user_id == user_id,
             RecordingSession.session_number == session_number,
         )
-        return await self.session.scalar(stmt)
+        return await self.session.scalar(query)

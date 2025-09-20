@@ -6,9 +6,9 @@ from typing import AsyncGenerator
 from app.models.base import Base
 
 
-DATABASE_URL = settings.DATABASE_URL
+DATABASE_URL = settings.database_url
 
-async_engine = create_async_engine(settings.DATABASE_URL, echo=False)
+async_engine = create_async_engine(settings.database_url, echo=False)
 async_session_maker = async_sessionmaker(async_engine, expire_on_commit=False)
 
 

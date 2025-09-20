@@ -11,7 +11,7 @@ def build_ikb_access_user_agreement() -> InlineKeyboardMarkup:
 def build_ikb_training_actions() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.button(text="🎙 Начать запись", callback_data="rec:start")
-    kb.button(text="🧪 Диагностика", callback_data="diag:run")
+    kb.button(text="🧪 Диагностика", callback_data="diag:show")
     kb.button(text="🎯 Тренировочные задания", callback_data="test:test")
     kb.button(text="🌀 Скороговорки", callback_data="test:test")
     kb.button(text="💰 Оплата", callback_data="diag:run")

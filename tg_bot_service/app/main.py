@@ -22,7 +22,7 @@ from handlers import (
 
 load_dotenv()
 
-BOT_TOKEN = settings.BOT_TOKEN
+BOT_TOKEN = settings.telegram_bot_token
 if not BOT_TOKEN:
     raise RuntimeError("Не найден BOT_TOKEN в .env")
 

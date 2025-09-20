@@ -1,41 +1,27 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, BufferedInputFile, FSInputFile
+
+from app.clients.diagnosis import DiagnosisClient
+from app.clients.requests.diagnosis import DiagnosisRequest
 
 from app.database.database import get_async_session
 from app.keyboards.sessions import build_ikb_user_sessions
-import httpx
+from pathlib import Path
 
 from app.repositories.user import UserRepository
+from app.services.recording import RecordingService
 from app.services.recording_session import RecordingSessionService
+import re
+
+from app.services.user import UserService
 
 router = Router()
 
-
-async def send_for_diag(
-    paths: list[str],
-):
-    # Transform relative paths to absolute paths for the AI services
-    # The AI services expects paths relative to /app/records
-    transformed_paths = []
-    for path in paths:
-        # Convert relative path like "records/693505334/2/1.wav" to "/app/records/693505334/2/1.wav"
-        if path.startswith("records/"):
-            # Remove "records/" prefix and add "/app/records/" prefix
-            relative_path = path.replace("records/", "")
-            transformed_path = f"/app/records/{relative_path}"
-        else:
-            transformed_path = path
-        transformed_paths.append(transformed_path)
-
-    async with httpx.AsyncClient(timeout=60) as c:
-        resp = await c.post(
-            "http://ai_predict_service:8000/diagnose", json=transformed_paths
-        )
-        resp.raise_for_status()
-        return resp.json()
+BASE_DIR = Path(__file__).parent.parent
+PDF_PATH = BASE_DIR / "templates/pdf.pdf"
 
 
-@router.callback_query(F.data == "diag:run")
+@router.callback_query(F.data == "diag:show")
 async def show_diagnosis(
     cq: CallbackQuery,
 ):
@@ -60,41 +46,47 @@ async def show_diagnosis(
     await cq.answer()
 
 
-# @router.message(F.text.regexp(r"^Сессия\s+\d+$"))
-# async def handle_session_result(msg: Message):
-#     """Пользователь нажал кнопку «Сессия N»."""
-#
-#     try:
-#         session_number = int(msg.text.split()[-1])
-#     except ValueError:
-#         await msg.answer("Номер сессии не распознан.")
-#         return
-#
-#     user_tg_id = msg.from_user.id
-#
-#     async with get_async_session() as database:
-#         diag_repo = DiagnosisRepository(database)
-#         rec_repo = RecordingRepository(database)
-#
-#         session_obj = await diag_repo.get_by_number(
-#             user_id=user_tg_id,
-#             session_number=session_number,
-#         )
-#         if not session_obj:
-#             await msg.answer("Такой сессии не найдено.")
-#             return
-#
-#         paths = await rec_repo.get_paths_by_session(session_obj.id)
-#
-#     if not paths:
-#         await msg.answer("У этой сессии нет записей.")
-#         return
-#
-#     result = await send_for_diag(paths)
-#     diagnosis = result["diagnosis"]
-#     recommendation = result["recommendation"]
-#     logs = result["logs"]  # если хотите вывести/сохранить
-#
-#     # --- ответ пользователю ---
-#     answer = f"Результат сессии {session_number}:\n\n{recommendation}"
-#     await msg.answer(answer, disable_web_page_preview=True)
+@router.callback_query(F.data.regexp(r"^diag:session:(\d+)$"))
+async def handle_session_result_cq(cq: CallbackQuery):
+    """Пользователь нажал кнопку «Сессия N»."""
+
+    try:
+        m = re.match(r"^diag:session:(\d+)$", cq.data or "")
+        session_number = int(m.group(1))
+    except ValueError:
+        await cq.message.answer("Номер сессии не распознан.")
+        return
+
+    async with get_async_session() as session:
+        recording_session_service = RecordingSessionService(session)
+        recording_service = RecordingService(session)
+        user_service = UserService(session)
+
+        user = await user_service.get_or_create(cq.from_user.id)
+        recording_session = await recording_session_service.get_by_number(
+            user_id=user.id,
+            session_number=session_number,
+        )
+        if not recording_session:
+            await cq.message.answer("Такой сессии не найдено.")
+            return
+
+        mongo_object_ids = await recording_service.get_mongo_objects_ids_by_session(
+            recording_session.id
+        )
+
+    if not mongo_object_ids:
+        await cq.message.answer("У этой сессии нет записей.")
+        return
+    data = DiagnosisRequest(mongo_ids=mongo_object_ids)
+    results = await DiagnosisClient().get_diagnosis(data=data)
+
+    doc = FSInputFile(
+        PDF_PATH,
+        filename="report.pdf",
+    )
+
+    await cq.message.answer_document(
+        document=doc,
+        caption=f"Ваш PDF 📄. Результат: {results}",
+    )

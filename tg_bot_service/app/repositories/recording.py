@@ -31,14 +31,14 @@ class RecordingRepository(BaseRepository):
         recording_session_id: int,
         user_id: int,
         word_id: int,
-        file_path: str = "",
+        mongo_oid: str = "",
     ) -> Recording:
         """Создать объект Recording"""
         recording = Recording(
             recording_session_id=recording_session_id,
             user_id=user_id,
             word_id=word_id,
-            file_path=str(file_path),
+            mongo_oid=str(mongo_oid),
         )
         self.session.add(recording)
         await self.session.commit()
@@ -83,14 +83,14 @@ class RecordingRepository(BaseRepository):
         sessions = result.scalars()
         return list(sessions)
 
-    async def get_paths_by_session(
+    async def get_mongo_objects_ids_by_session(
         self,
         recording_session_id: int,
     ) -> list[str]:
-        """Получить список путей файлов записи по id сессии"""
+        """Получить список oid записей по id сессии"""
         query = (
             select(
-                Recording.file_path,
+                Recording.mongo_oid,
             )
             .where(
                 Recording.recording_session_id == recording_session_id,
@@ -100,5 +100,5 @@ class RecordingRepository(BaseRepository):
             )
         )
         result: Result = await self.session.execute(query)
-        paths = result.scalars()
-        return list(paths)
+        mongo_object_ids = result.scalars()
+        return list(mongo_object_ids)

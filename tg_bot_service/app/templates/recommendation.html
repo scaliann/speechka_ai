@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <style>
+    @font-face {
+      font-family: 'DejaVuSans';
+      src: url("{{ font_path }}") format("truetype");
+    }
+    body {
+      font-family: 'DejaVuSans', sans-serif;
+      margin: 24px;
+      line-height: 1.45;
+      color: #1f2d3d;
+      font-size: 14px;
+    }
+    h1 { font-size: 22px; margin: 0 0 12px; }
+    h2 { font-size: 18px; margin-top: 20px; }
+    .meta {
+      font-size: 12px; color: #6b7280; margin-bottom: 12px;
+    }
+    .card {
+      padding: 16px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff;
+    }
+    .footer {
+      margin-top: 24px; font-size: 12px; color: #6b7280;
+    }
+    a { color: #2563eb; text-decoration: none; }
+    ul { margin: 8px 0 8px 20px; }
+    pre { white-space: pre-wrap; font-family: 'DejaVuSans', sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>{{ title }}</h1>
+    <div class="meta">
+      Дата: {{ date }}<br>
+      Пациент: {{ child_name or "—" }} | Сессия: {{ session_number or "—" }}
+    </div>
+    <pre>{{ text }}</pre>
+  </div>
+
+  <div class="footer">
+    Сформировано автоматически сервисом речи. Это не медицинское заключение.
+  </div>
+</body>
+</html>

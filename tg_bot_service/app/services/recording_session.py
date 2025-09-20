@@ -33,3 +33,13 @@ class RecordingSessionService:
         return await self.recording_session_repository.get_last_five_user_sessions(
             user_id=user_id
         )
+
+    async def get_by_number(
+        self,
+        user_id: int,
+        session_number: int,
+    ) -> RecordingSession:
+        return await self.recording_session_repository.get_by_number(
+            user_id=user_id,
+            session_number=session_number,
+        )

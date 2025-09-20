@@ -43,10 +43,10 @@ async def save_voice_to_mongo(
     wav_bytes = wav_buf.read()
 
     mongo_repository = MongoRecordingsRepository()
-    file_id = await mongo_repository.save_wav(
+    mongo_oid = await mongo_repository.save_wav(
         data=wav_bytes,
         tg_id=tg_id,
         session_id=recording_session_id,
         word_id=word_id,
     )
-    return str(file_id)
+    return str(mongo_oid)

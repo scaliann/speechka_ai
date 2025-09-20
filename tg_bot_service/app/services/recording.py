@@ -63,7 +63,7 @@ class RecordingService:
         total_words: int,
     ) -> bool:
         """Функция отвечает за сохранение голосового"""
-        file_path = await save_voice_to_mongo(
+        mongo_oid = await save_voice_to_mongo(
             bot=bot,
             voice=voice,
             tg_id=tg_id,
@@ -75,7 +75,7 @@ class RecordingService:
             recording_session_id=recording_session_id,
             user_id=user_id,
             word_id=word_id,
-            file_path=file_path,
+            mongo_oid=mongo_oid,
         )
 
         word_count = await self.recording_repository.count_in_session(
@@ -101,4 +101,12 @@ class RecordingService:
         await self.recording_session_repository.update_status(
             recording_session_id=recording_session_id,
             status=status,
+        )
+
+    async def get_mongo_objects_ids_by_session(
+        self,
+        recording_session_id: int,
+    ) -> list[str]:
+        return await self.recording_repository.get_mongo_objects_ids_by_session(
+            recording_session_id=recording_session_id
         )

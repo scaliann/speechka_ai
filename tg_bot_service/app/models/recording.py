@@ -21,7 +21,7 @@ class Recording(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utc_plus_3
     )
-    file_path: Mapped[str] = mapped_column(String, default="")
+    mongo_oid: Mapped[str] = mapped_column(String, default="")
 
     user: Mapped["User"] = relationship(back_populates="recordings")
     recording_sessions: Mapped["RecordingSession"] = relationship(
