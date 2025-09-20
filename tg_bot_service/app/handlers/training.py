@@ -53,7 +53,7 @@ async def training_done(
 ) -> None:
     m = re.match(r"^training:done:(\d+)$", cq.data or "")
     done_user_training_id = int(m.group(1))
-    print(done_user_training_id)
+
     async with get_async_session() as session:
         training_service = TrainingService(session)
         user_training_service = UserTrainingService(session)
@@ -76,7 +76,6 @@ async def training_done(
             user_id=user.id,
             training_id=training.id,
         )
-        print(user_training_id)
 
     await cq.message.answer(
         training.text,

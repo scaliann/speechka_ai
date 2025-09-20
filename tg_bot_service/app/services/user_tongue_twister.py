@@ -1,6 +1,4 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.models.tongue_twister import TongueTwister
 from app.repositories.user_tongue_twister import UserTongueTwisterRepository
 
 
@@ -24,4 +22,12 @@ class UserTongueTwisterService:
         return await self.user_tongue_twister_repository.create(
             user_id=user_id,
             tongue_twister_id=tongue_twister_id,
+        )
+
+    async def get_done(
+        self,
+        user_id: int,
+    ):
+        return await self.user_tongue_twister_repository.get_done(
+            user_id=user_id,
         )

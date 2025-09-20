@@ -17,3 +17,8 @@ class TrainingService:
         return await self.training_repository.get_free_trainings(
             user_id=user_id,
         )
+
+    async def get_all(
+        self,
+    ):
+        return await self.training_repository.get_all()

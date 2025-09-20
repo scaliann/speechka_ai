@@ -50,3 +50,14 @@ async def save_voice_to_mongo(
         word_id=word_id,
     )
     return str(mongo_oid)
+
+
+def progress_bar(
+    done: int,
+    total: int,
+    width: int = 10,
+) -> str:
+    if total <= 0:
+        return "—"
+    filled = int(width * done / total)
+    return "▰" * filled + "▱" * (width - filled) + f" {done} из {total}"

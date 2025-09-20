@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import select
 
 from app.models.training import Training
@@ -24,5 +26,15 @@ class TrainingRepository(BaseRepository):
                 UserTraining.id,
             )
         )
-        res = await self.session.execute(query)
-        return res.scalars().all()
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
+    async def get_all(
+        self,
+    ):
+        query = select(
+            Training,
+        )
+
+        result = await self.session.execute(query)
+        return result.scalars().all()

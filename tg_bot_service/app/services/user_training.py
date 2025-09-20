@@ -34,3 +34,11 @@ class UserTrainingService:
         return await self.user_training_repository.set_done(
             done_user_training_id=done_user_training_id,
         )
+
+    async def get_done(
+        self,
+        user_id: int,
+    ):
+        return await self.user_training_repository.get_done(
+            user_id=user_id,
+        )

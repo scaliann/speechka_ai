@@ -1,4 +1,4 @@
-from sqlalchemy import insert, update
+from sqlalchemy import insert, update, select
 
 from app.models.user_training import UserTraining
 from app.repositories.base import BaseRepository
@@ -44,3 +44,16 @@ class UserTrainingRepository(
             )
         )
         await self.session.execute(query)
+
+    async def get_done(
+        self,
+        user_id: int,
+    ):
+        query = select(
+            UserTraining,
+        ).where(
+            UserTraining.user_id == user_id,
+            UserTraining.is_done == True,
+        )
+        result = await self.session.execute(query)
+        return result.scalars().all()

@@ -12,7 +12,7 @@ from handlers import (
     start_router,
     recording_router,
     menu_router,
-    user_router,
+    profile_router,
     details_router,
     user_agreement_router,
     diagnosis_router,
@@ -33,7 +33,7 @@ dp = Dispatcher(storage=MemoryStorage())
 dp.include_router(start_router)
 dp.include_router(recording_router)
 dp.include_router(menu_router)
-dp.include_router(user_router)
+dp.include_router(profile_router)
 dp.include_router(details_router)
 dp.include_router(user_agreement_router)
 dp.include_router(diagnosis_router)

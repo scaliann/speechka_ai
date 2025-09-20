@@ -19,3 +19,15 @@ class UserTongueTwisterRepository(BaseRepository):
         )
 
         await self.session.execute(query)
+
+    async def get_done(
+        self,
+        user_id: int,
+    ):
+        query = select(
+            UserTongueTwister,
+        ).where(
+            UserTongueTwister.user_id == user_id,
+        )
+        result = await self.session.execute(query)
+        return result.scalars().all()

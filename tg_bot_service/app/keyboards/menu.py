@@ -14,9 +14,9 @@ def build_ikb_training_actions() -> InlineKeyboardMarkup:
     kb.button(text="🧪 Диагностика", callback_data="diagnosis:show")
     kb.button(text="🧠 Тренировка", callback_data="training:show")
     kb.button(text="🌀 Скороговорки", callback_data="tongue_twisters:show")
-    kb.button(text="💰 Оплата", callback_data="diagnosis:run")
+    kb.button(text="💰 Оплата", callback_data="payment:run")
     kb.button(text="📖 Подробнее", callback_data="details:open")
-    kb.button(text="🏆 Профиль", callback_data="details:open")
+    kb.button(text="🏆 Профиль", callback_data="profile:show")
     kb.adjust(2)
     return kb.as_markup()
 
