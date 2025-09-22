@@ -17,9 +17,9 @@ ctx = _AppContext()
 
 
 async def setup_mongodb() -> None:
-    if not settings.MONGO_URI:
+    if not settings.mongo_db:
         return
-    ctx.mongo_client = motor_asyncio.AsyncIOMotorClient(settings.MONGO_URI)
+    ctx.mongo_client = motor_asyncio.AsyncIOMotorClient(settings.mongo_db)
 
 
 async def close_mongodb() -> None:

@@ -45,7 +45,7 @@ class DiagnosisService:
                 p = Path(tmpdir) / f"{idx}.wav"
                 p.write_bytes(wav_bytes)
                 paths.append(p)
-
+            print(paths)
             results_dict: Dict[int, str] = {
                 idx: _predict_one(p) for idx, p in enumerate(paths, start=1)
             }
@@ -53,8 +53,6 @@ class DiagnosisService:
         results = {str(k): v for k, v in results_dict.items()}
         diagnosis = self.majority_class(results_dict)
         return {"results": results, "diagnosis": diagnosis}
-
-        return result
 
     def majority_class(
         self,

@@ -1,13 +1,12 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, BufferedInputFile, FSInputFile
+from aiogram.types import CallbackQuery, FSInputFile
 
 from app.clients.diagnosis import DiagnosisClient
 from app.clients.requests.diagnosis import DiagnosisRequest
-from app.common.enums import DiagnosisResult
+from app.common.utils import get_report_path
 
 from app.database.database import get_async_session
 from app.keyboards.sessions import build_ikb_user_sessions
-from pathlib import Path
 
 from app.repositories.user import UserRepository
 from app.services.diagnosis import DiagnosisService
@@ -18,9 +17,6 @@ import re
 from app.services.user import UserService
 
 router = Router()
-
-BASE_DIR = Path(__file__).parent.parent
-PDF_PATH = BASE_DIR / "templates/burr_recommendation.pdf"
 
 
 @router.callback_query(F.data == "diagnosis:show")
@@ -92,11 +88,18 @@ async def handle_session_result_cq(cq: CallbackQuery):
             recording_session_id=recording_session.id,
         )
 
-    doc = FSInputFile(
-        PDF_PATH,
-        filename="report.pdf",
+    report_path = get_report_path(diagnosis=diagnosis_response.diagnosis)
+
+    report = FSInputFile(
+        report_path,
+        filename="Результат диагностики.pdf",
     )
+
     await cq.message.answer_document(
-        document=doc,
-        caption=f"Ваш PDF 📄. Результат: {diagnosis_response}",
+        document=report,
+        caption=f"""
+📄 Ваш отчет по проведенной диагностике готов!
+
+❕ Напоминаем, что содержимое отчета не является диагнозом, а всего лишь предположением с дружескими советами :)
+""",
     )

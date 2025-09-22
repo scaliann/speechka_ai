@@ -8,9 +8,9 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 
 class Settings(BaseSettings):
-    MONGO_URI: str
-    mongodb_recordings_db: str = "speechka"
-    mongodb_recordings_bucket: str = "recordings"
+    mongo_db: str = ""
+    mongodb_recordings_db: str = ""
+    mongodb_recordings_bucket: str = ""
 
     class Config:
         env_file = "../.env"

@@ -15,7 +15,7 @@ class RecordingSession(Base):
     )
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    session_number: Mapped[int] = mapped_column(ForeignKey("recording_session.id"))
+    session_number: Mapped[int] = mapped_column()
     status: Mapped[SessionStatus] = mapped_column(
         Enum(SessionStatus),
         default=SessionStatus.active,
