@@ -2,30 +2,22 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Установка системных зависимостей
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    libsndfile1 \
-    curl \
-    gcc \
-    g++ \
+# Системные пакеты (ffmpeg тебе нужен) + инструменты сборки
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg build-essential git \
     && rm -rf /var/lib/apt/lists/*
 
-# Копирование requirements и установка зависимостей
-COPY requirements.txt requirements.txt
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+# Обновляем pip И ставим setuptools+wheel (важно!)
+RUN python -m pip install --upgrade pip setuptools wheel && pip cache purge
 
-# Копирование исходного кода
+
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY app/ ./app/
 
-
-
-# Переменные окружения
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-# Открываем порт для FastAPI
-EXPOSE 8000
-
-# Команда запуска
 CMD ["python", "app/main.py"]

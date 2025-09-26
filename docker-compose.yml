@@ -1,8 +1,26 @@
-version: '3.1'
-
 services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   mongo:
-    image: mongo:6
+    image: mongo:8.0
+    restart: unless-stopped
+
     ports:
       - "27017:27017"
     volumes:
@@ -45,5 +63,33 @@ services:
     depends_on:
       - kafka
 
+  diagnosis_service:
+    volumes:
+      - ./diagnosis:/app
+    build:
+      context: ./diagnosis
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+    - mongo
+    - kafka
+    env_file: .env
+
+  telegram_bot_service:
+      volumes:
+        - ./telegram_bot:/app
+      build:
+        context: ./telegram_bot
+        dockerfile: Dockerfile
+      restart: unless-stopped
+      depends_on:
+        - db
+        - mongo
+        - kafka
+        - diagnosis_service
+      env_file: .env
+
+
 volumes:
   mongo-data:
+  db_data:

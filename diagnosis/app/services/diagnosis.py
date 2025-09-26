@@ -30,10 +30,13 @@ class DiagnosisService:
 
         predicted_result = await self.predict_all(data.mongo_object_ids)
 
+        diagnosis = predicted_result
+
         report_path = get_report_path(diagnosis="healthy")
         await send_pdf_report(
             chat_id=data.chat_id,
             report_path=report_path,
+            diagnosis=diagnosis,
         )
 
     async def predict_all(

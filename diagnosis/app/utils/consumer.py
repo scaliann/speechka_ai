@@ -47,10 +47,7 @@ async def consumer(routing_data: RoutingData):
                         else str(msg.value)
                     )
                     logger.info(
-                        "Consume message from topic=%s partition=%s offset=%s",
-                        routing_data.topic,
-                        msg.partition,
-                        msg.offset,
+                        f"Consume message from topic={routing_data.topic} partition{msg.partition} offset={msg.offset}",
                         extra={
                             "data": raw,
                         },

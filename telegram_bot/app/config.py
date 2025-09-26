@@ -13,7 +13,6 @@ class Settings(BaseSettings):
     mongo_db: str
     mongodb_recordings_db: str = "speechka"
     mongodb_recordings_bucket: str = "recordings"
-    diagnosis_host: str
     kafka_host: str
 
     class Config:
