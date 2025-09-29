@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy import Result, func, select, update
 from app.repositories.base import BaseRepository
 from app.common.enums import SessionStatus
@@ -73,7 +75,7 @@ class SessionRepository(BaseRepository):
     async def get_last_five_user_sessions(
         self,
         user_id: int,
-    ) -> list[RecordingSession]:
+    ) -> Sequence[RecordingSession]:
         """
         Возвращает все сессии данного пользователя,
         упорядоченные по session_number.
@@ -92,8 +94,9 @@ class SessionRepository(BaseRepository):
             .limit(5)
         )
         result: Result = await self.session.execute(query)
-        user_sessions: list[RecordingSession] = result.scalars().all()
-        return user_sessions
+        return result.scalars().all()
+
+
 
     async def get_by_number(
         self,

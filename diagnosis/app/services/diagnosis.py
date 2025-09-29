@@ -4,6 +4,7 @@ from typing import Dict, List, Any
 from aiogram import Bot
 
 from app.ai.models.predict import predict_one
+from app.common.aggregate_diagnosis import aggregate_diagnosis
 from app.common.report_path import get_report_path
 from app.config import settings
 from app.kafka.schemas.diagnosis import DiagnosisSchema
@@ -28,15 +29,14 @@ class DiagnosisService:
         Содержит в себе основную логику диагностики и отправки.
         """
 
-        predicted_result = await self.predict_all(data.mongo_object_ids)
+        ai_response = await self.predict_all(data.mongo_object_ids)
+        aggregated_result = aggregate_diagnosis(ai_response)
 
-        diagnosis = predicted_result
+        report_path = get_report_path(diagnosis=aggregated_result["top_label"])
 
-        report_path = get_report_path(diagnosis="healthy")
         await send_pdf_report(
             chat_id=data.chat_id,
             report_path=report_path,
-            diagnosis=diagnosis,
         )
 
     async def predict_all(
